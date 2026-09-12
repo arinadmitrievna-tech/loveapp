@@ -31,7 +31,7 @@ jobs:
             python3-pip \
             python3-venv \
             autoconf automake \
-            libtool libtool-bin \
+            libtool libtool-bin libltdl-dev \
             pkg-config \
             zlib1g-dev \
             libncurses5-dev libncursesw5-dev \
