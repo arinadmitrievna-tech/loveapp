@@ -45,10 +45,26 @@ jobs:
 
       - name: Build APK
         run: |
-          buildozer -v android debug
+          set -o pipefail
+          buildozer -v android debug 2>&1 | tee build.log
+
+      - name: Show errors
+        if: failure()
+        run: |
+          echo "===== ПОСЛЕДНИЕ 100 СТРОК ====="
+          tail -n 100 build.log
+          echo "===== СТРОКИ С ОШИБКАМИ ====="
+          grep -n -E "ERROR|error:|Error|FAILED|failed" build.log | tail -n 50 || true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: LoveApp-APK
           path: bin/*.apk
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LoveApp-build-log
+          path: build.log
