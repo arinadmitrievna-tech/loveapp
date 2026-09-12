@@ -26,12 +26,16 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
-            git zip unzip openjdk-17-jdk \
+            git zip unzip \
+            openjdk-17-jdk \
             python3-pip python3-venv \
-            autoconf automake libtool libtool-bin \
-            pkg-config zlib1g-dev \
+            autoconf automake \
+            libtool libtool-bin \
+            pkg-config \
+            zlib1g-dev \
             libncurses5-dev libncursesw5-dev \
-            cmake libffi-dev libssl-dev
+            cmake libffi-dev libssl-dev \
+            gettext
 
       - name: Install Rust
         run: |
@@ -43,6 +47,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install buildozer setuptools cython==0.29.34
 
+      - name: Clean Buildozer cache
+        run: |
+          rm -rf .buildozer
+          rm -rf bin
+
       - name: Build APK
         run: |
           set -o pipefail
@@ -51,12 +60,14 @@ jobs:
       - name: Show errors
         if: failure()
         run: |
-          echo "===== ПОСЛЕДНИЕ 100 СТРОК ====="
-          tail -n 100 build.log
+          echo "===== ПОСЛЕДНИЕ 150 СТРОК ====="
+          tail -n 150 build.log
+
           echo "===== СТРОКИ С ОШИБКАМИ ====="
-          grep -n -E "ERROR|error:|Error|FAILED|failed" build.log | tail -n 50 || true
+          grep -n -E "ERROR|error:|Error|FAILED|failed|not supported" build.log | tail -n 100 || true
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: LoveApp-APK
